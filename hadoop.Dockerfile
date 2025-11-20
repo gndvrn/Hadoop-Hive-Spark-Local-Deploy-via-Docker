@@ -39,10 +39,6 @@ COPY config/hadoop-env.sh $HADOOP_HOME/etc/hadoop/
 # Create hdfs user and set permissions
 RUN useradd -m hdfs
 RUN chown -R hdfs:hdfs /home/hadoop
-ENV HADOOP_USER_NAME=hdfs
-ENV HDFS_NAMENODE_USER=hdfs
-ENV HDFS_DATANODE_USER=hdfs
-ENV HDFS_SECONDARYNAMENODE_USER=hdfs
 
 
 # Expose Hadoop ports

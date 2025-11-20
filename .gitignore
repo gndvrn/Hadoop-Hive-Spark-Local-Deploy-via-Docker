@@ -1,8 +1,15 @@
 postgres/data/
-downloads/
-downloads_binaries/
-hadoop/
-/downloads/
-venv
-.idea/
-downloads
+
+hadoop/datanode/data/*
+!hadoop/datanode/data/.gitkeep
+
+hadoop/namenode/data/*
+!hadoop/namenode/data/.gitkeep
+
+downloads/*
+!downloads/.gitkeep
+
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints

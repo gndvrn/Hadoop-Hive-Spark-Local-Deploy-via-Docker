@@ -44,10 +44,6 @@ EXPOSE 10000 10002
 RUN useradd -m hdfs
 RUN chown -R hdfs:hdfs /home/hadoop
 RUN chown -R hdfs:hdfs /home/hive
-ENV HADOOP_USER_NAME=hdfs
-ENV HDFS_NAMENODE_USER=hdfs
-ENV HDFS_DATANODE_USER=hdfs
-ENV HDFS_SECONDARYNAMENODE_USER=hdfs
 
 
 # Entrypoint script to start Hive services

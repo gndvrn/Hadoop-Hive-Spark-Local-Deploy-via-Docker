@@ -2,31 +2,15 @@ services:
   postgres:
     image: postgres:13
     container_name: hive-metastore-postgres
+    hostname: postgres
     environment:
-      POSTGRES_DB: metastore
-      POSTGRES_USER: hiveuser
-      POSTGRES_PASSWORD: hivepassword
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./postgres/init-hive-metastore.sql:/docker-entrypoint-initdb.d/init-hive-metastore.sql
       - ./postgres/data:/var/lib/postgresql/data
     ports:
-      - "5429:5432"
-    networks:
-      - hadoop-network
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    volumes:
-      - ./postgres/servers.json:/pgadmin4/servers.json
-      - ./postgres/.pgpass:/pgpass/pgpassfile
-    ports:
-      - "8079:80"
-    depends_on:
-      - postgres
+      - "5432:5432"
     networks:
       - hadoop-network
 
@@ -37,12 +21,12 @@ services:
     container_name: namenode
     hostname: namenode
     environment:
-      - HDFS_NAMENODE_USER=hdfs
-      - HDFS_DATANODE_USER=hdfs
-      - HDFS_SECONDARYNAMENODE_USER=hdfs
-      - CLUSTER_NAME=hadoop-cluster
-      - HDFS_NAMENODE_USER=root
       - HADOOP_SSH_OPTS="-o StrictHostKeyChecking=no"
+      - HDFS_NAMENODE_USER=${HDFS_NAMENODE_USER}
+      - HDFS_DATANODE_USER=${HDFS_DATANODE_USER}
+      - HADOOP_USER_NAME=${HADOOP_USER_NAME}
+      - HADOOP_CLUSTER_NAME=${HADOOP_CLUSTER_NAME}
+      - HDFS_SECONDARYNAMENODE_USER=${HDFS_SECONDARYNAMENODE_USER}
     volumes:
       - ./hadoop/namenode/data:/hadoop/dfs/name
     ports:
@@ -58,9 +42,10 @@ services:
     container_name: datanode
     hostname: datanode
     environment:
-      - HDFS_NAMENODE_USER=hdfs
-      - HDFS_DATANODE_USER=hdfs
-      - HDFS_SECONDARYNAMENODE_USER=hdfs
+      - HDFS_DATANODE_USER=${HDFS_DATANODE_USER}
+      - HADOOP_USER_NAME=${HADOOP_USER_NAME}
+      - HDFS_SECONDARYNAMENODE_USER=${HDFS_SECONDARYNAMENODE_USER}
+      - HADOOP_CLUSTER_NAME=${HADOOP_CLUSTER_NAME}
     volumes:
       - ./hadoop/datanode/data:/hadoop/dfs/data
     ports:
@@ -74,14 +59,12 @@ services:
       dockerfile: hive.Dockerfile
     container_name: hive-server
     environment:
-      - HDFS_NAMENODE_USER=hdfs
-      - HDFS_DATANODE_USER=hdfs
-      - HDFS_SECONDARYNAMENODE_USER=hdfs
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DB=metastore
-      - POSTGRES_USER=hiveuser
-      - POSTGRES_PASSWORD=hivepassword
-      - HIVE_CONF_DIR=/home/hive/conf
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - HDFS_NAMENODE_USER=${HDFS_NAMENODE_USER}
+      - HDFS_DATANODE_USER=${HDFS_DATANODE_USER}
+      - HDFS_SECONDARYNAMENODE_USER=${HDFS_SECONDARYNAMENODE_USER}
     depends_on:
       - postgres
       - namenode
@@ -92,21 +75,24 @@ services:
     networks:
       - hadoop-network
 
-  hue:
-    image: gethue/hue:latest
-    container_name: hue
+  jupyter-pyspark:
+    build:
+      context: ./jupyter
+      dockerfile: Dockerfile
+    container_name: jupyter-pyspark
+    command: jupyter notebook --no-browser --NotebookApp.token='' --NotebookApp.password='' --ip='*' --allow-root
     environment:
-      - HUE_CONF_DIR=/hue/desktop/conf
-      - HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=true
+      GRANT_SUDO: "yes"
     volumes:
-      - ./hue:/hue/desktop/conf
+      - jupyter_data:/home/jovyan
     ports:
-      - "8891:8888"
-    depends_on:
-      - hive
+      - "8888:8888"
     networks:
       - hadoop-network
 
 networks:
   hadoop-network:
     driver: bridge
+
+volumes:
+  jupyter_data:

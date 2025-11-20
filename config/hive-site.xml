@@ -3,7 +3,7 @@
     <!-- JDBC connection string for PostgreSQL -->
     <property>
         <name>javax.jdo.option.ConnectionURL</name>
-        <value>jdbc:postgresql://postgres:5432/metastore</value>
+        <value>jdbc:postgresql://postgres:5432/hive_metastore</value>
         <description>PostgreSQL connection URL for Hive metastore</description>
     </property>
 
@@ -17,14 +17,14 @@
     <!-- PostgreSQL username -->
     <property>
         <name>javax.jdo.option.ConnectionUserName</name>
-        <value>hiveuser</value>
+        <value>hive_user</value>
         <description>PostgreSQL username for Hive metastore</description>
     </property>
 
     <!-- PostgreSQL password -->
     <property>
         <name>javax.jdo.option.ConnectionPassword</name>
-        <value>hivepassword</value>
+        <value>hive_password</value>
         <description>PostgreSQL password for Hive metastore</description>
     </property>
 
